@@ -11,6 +11,18 @@ class CartItemTbl extends Table {
   TextColumn get description => text().nullable()();
   RealColumn get price => real().withDefault(const Constant(0.0))();
   TextColumn get featuredImage => text()();
+  IntColumn get quantity => integer().withDefault(const Constant(1))();
   DateTimeColumn get createdAt =>
       dateTime().withDefault(Constant(DateTime.now()))();
 }
+
+class FavoritesItemTbl extends Table {
+  IntColumn get id => integer()();
+  TextColumn get title => text().nullable()();
+  TextColumn get description => text().nullable()();
+  RealColumn get price => real().withDefault(const Constant(0.0))();
+  TextColumn get featuredImage => text()();
+  DateTimeColumn get createdAt =>
+      dateTime().withDefault(Constant(DateTime.now()))();
+}
+

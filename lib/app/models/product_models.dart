@@ -1,5 +1,3 @@
-part of 'models.dart';
-
 class ProductsListModel {
   ProductsListModel({
     required this.products,
@@ -58,17 +56,17 @@ class ProductItem {
   final List<String> images;
 
   factory ProductItem.fromJson(Map<String, dynamic> json) => ProductItem(
-        id: json["id"] ?? 0,
-        title: json["title"] ?? '',
-        description: json["description"] ?? '',
-        price: (json["price"] is int) ? json["price"] : (json["price"] as double).toInt(),
-        discountPercentage: json["discountPercentage"]?.toDouble() ?? 0.0,
-        rating: json["rating"]?.toDouble() ?? 0.0,
-        stock: json["stock"] ?? 0,
-        brand: json["brand"] ?? '',
-        category: json["category"] ?? '',
-        thumbnail: json["thumbnail"] ?? '',
-        images: List<String>.from(json["images"]?.map((x) => x) ?? []),
+        id: json["id"],
+        title: json["title"],
+        description: json["description"],
+        price: json["price"],
+        discountPercentage: json["discountPercentage"]?.toDouble(),
+        rating: json["rating"]?.toDouble(),
+        stock: json["stock"],
+        brand: json["brand"],
+        category: json["category"],
+        thumbnail: json["thumbnail"],
+        images: List<String>.from(json["images"].map((x) => x)),
       );
 
   Map<String, dynamic> toJson() => {

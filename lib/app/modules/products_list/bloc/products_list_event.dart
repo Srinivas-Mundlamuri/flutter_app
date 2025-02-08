@@ -8,4 +8,5 @@ abstract class ProductsListEvent extends Equatable {
 
 class ProductsListStarted extends ProductsListEvent {
   List<ProductItem> get cartItems => [];
+  List<ProductItem> get favoritesItems => [];
 }

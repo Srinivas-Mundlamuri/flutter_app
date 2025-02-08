@@ -1,5 +1,3 @@
-// Author - Rashmin Dungrani
-
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';

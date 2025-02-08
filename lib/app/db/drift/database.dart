@@ -1,78 +1,62 @@
 import 'package:drift/drift.dart';
-import 'package:flutter/foundation.dart';
-
-import 'package:shopping_cart/app/db/drift/tables.dart';
-import 'package:shopping_cart/injection_container.dart';
-
-import 'DAOs/cart_item_dao.dart';
-
-import 'connection/connection.dart';
-import 'db_config.dart';
+import 'package:drift/native.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 part 'database.g.dart';
 
-@DriftDatabase(tables: [
-  CartItemTbl,
-], daos: [
-  CartItemDao
-])
+@DataClassName('CartItemTblData')
+class CartItemTbl extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  RealColumn get price => real()();
+  TextColumn get description => text()();
+  TextColumn get featuredImage => text()();
+  DateTimeColumn get createdAt => dateTime()();
+  IntColumn get quantity => integer().withDefault(const Constant(1))(); // Add quantity field
+}
+
+@DataClassName('FavoritesItemTblData')
+class FavoritesItemTbl extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get title => text()();
+  RealColumn get price => real()();
+  TextColumn get description => text()();
+  TextColumn get featuredImage => text()();
+  DateTimeColumn get createdAt => dateTime()();
+}
+
+@DriftDatabase(tables: [CartItemTbl, FavoritesItemTbl])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase({String? databasePath})
-      : super(openConnection(databasePath: databasePath));
-
-  late DBConfig dbConfig;
+  AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => DBConfig.schemaVersion;
+  int get schemaVersion => 1;
 
   @override
-  MigrationStrategy get migration {
-    return MigrationStrategy(
-      beforeOpen: (details) async {
-        // Runs after all the migrations but BEFORE any queries have a chance to execute
-        // await customStatement('PRAGMA foreign_keys = ON');
+  MigrationStrategy get migration => MigrationStrategy(
+        onCreate: (Migrator m) async {
+          await m.createAll();
+        },
+      );
 
-        if (details.wasCreated) {
-          await afterDBCreated();
-        }
-      },
-      onUpgrade: onUpgrade,
-    );
-  }
+  Future<List<CartItemTblData>> getAllCartItems() => select(cartItemTbl).get();
+  Future insertCartItem(CartItemTblData item) => into(cartItemTbl).insert(item);
+  Future deleteCartItem(int id) => (delete(cartItemTbl)..where((tbl) => tbl.id.equals(id))).go();
 
-  Future<void> afterDBCreated() async {
-    if (kDebugMode) {
-      print("Migration: AfterDBCreated methods started");
-    }
-  }
+  Future<List<FavoritesItemTblData>> getAllFavoritesItems() => select(favoritesItemTbl).get();
+  Future insertFavoritesItem(FavoritesItemTblData item) => into(favoritesItemTbl).insert(item);
+  Future deleteFavoritesItem(int id) => (delete(favoritesItemTbl)..where((tbl) => tbl.id.equals(id))).go();
 
-  Future<void> onUpgrade(m, from, to) async {
-    if (kDebugMode) {
-      print("Migration: onUpgrade methods started");
-    }
-    // if (from == 1) {
-    //   // The todoEntries.dueDate column was added in version 2.
-    //   await m.addColumn(todoEntries, todoEntries.dueDate);
-    // }
-  }
+  Future updateCartItem(CartItemTblData item) => update(cartItemTbl).replace(item); // Add updateCartItem method
+}
 
-  Future deleteDB() async {
-    final dbFile = sl.get<AppDatabase>().dbConfig.dbFile;
-    await dbFile.delete();
-
-    if (kDebugMode) {
-      print('drift db deleted');
-    }
-  }
-
-  // Future<bool> requestPermission(Permission permission) async {
-  //   if (!await permission.isGranted) {
-  //     final status = await permission.request();
-  //     if (status != PermissionStatus.granted) {
-  //       print("${permission} :: ${status}");
-  //       return false;
-  //     }
-  //   }
-  //   return true;
-  // }
+LazyDatabase _openConnection() {
+  return LazyDatabase(() async {
+    final dbFolder = await getApplicationDocumentsDirectory();
+    final file = File(p.join(dbFolder.path, 'db.sqlite'));
+    print("Database file path: ${file.path}");
+    return NativeDatabase(file);
+  });
 }
