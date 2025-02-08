@@ -18,10 +18,13 @@ These instructions will get you a copy of the project up and running on your loc
 To run this project, you need to have Flutter installed on your local machine. Follow the installation instructions [here](https://docs.flutter.dev/get-started/install).
 
 ## Installing
-1. Add this repository on your local machine:
+1. Clone this repository on your local machine using the following command:
+    ```bash
+    git clone https://github.com/Srinivas-Mundlamuri/flutter_app.git
+    ```
 2. Navigate to the project directory:
     ```bash
-    cd flutter-shopping-cart
+    cd flutter-app
     ```
 3. Install the dependencies using the following command:
     ```bash
